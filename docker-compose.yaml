@@ -1,0 +1,21 @@
+version: "4.22.1"
+
+services:
+  database:
+    build: ./database
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: test
+    restart: always
+  web:   
+    build: ./application
+    environment:
+      MYSQL_DATABASE: student_survey-db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_HOST: database
+    ports:
+      - "5000:5000"
+    depends_on:
+      - database
+    restart: on-failure
