@@ -11,4 +11,4 @@ Docker is used to run a web service and a mySQL service and those are dockerized
 
 You will require to have the Docker Application installed so that you can use the docker server for the containers
 
-- To run use `docker build ` then run `docker-compose up` to have all the services running inside a container for your use
+- To run use `docker-compose build --no-cache ` then run `docker-compose up` to have all the services running inside a container for your use
