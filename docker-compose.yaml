@@ -5,12 +5,12 @@ services:
     build: ./database
     environment:
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: test
+      MYSQL_DATABASE: student_survey_db
     restart: always
   web:   
     build: ./application
     environment:
-      MYSQL_DATABASE: student_survey-db
+      MYSQL_DATABASE: student_survey_db
       MYSQL_USER: root
       MYSQL_PASSWORD: password
       MYSQL_HOST: database
