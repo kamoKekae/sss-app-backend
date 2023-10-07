@@ -1,8 +1,4 @@
 
-ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY 'password';
-
-
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
@@ -360,6 +356,3 @@ INSERT INTO course(schoolID, numEnrolledStudents,lecturer) VALUES(1,1,"Reala");
 INSERT INTO enrollment(studentID, courseID) VALUES(1,1);
 
 SELECT * from students;
-
-
-flush privileges;
