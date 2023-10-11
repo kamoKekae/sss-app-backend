@@ -1,14 +1,6 @@
 // Imports
 const  express = require('express');
 
-// Helper Variable
-let courseName;
-// Ultimate response
-let RESPONSE = {};
-var courseNames = [];
-var checkListTopics = [];
-let checkListItemsArrays = [];
-
 // Routes
 const studentRouter = express.Router();
 const checkListRouter = express.Router();
@@ -36,7 +28,6 @@ checkListRouter.get('/getCheckLists',(req,res)=>{
           checklistitems ON checklist.checkListID = checklistitems.checkListID
         WHERE
           students.studentNumber = ${studentNumber}`;
-;
 
   
   // Get Students Primary ID and then get courses student enrolled in then get all checkLists
@@ -46,9 +37,7 @@ checkListRouter.get('/getCheckLists',(req,res)=>{
     connection.query(query,(err,row)=>{
       if(err){res.json({success:false , err})}
       res.json({success:true,row});});
-    
   }
-
 });
 
 studentRouter.get("/checklist/", (req, res) => {
@@ -100,7 +89,6 @@ class ResourceManager {
 
 
   // commentAPI
-
     API(){
     
         connection.query();
