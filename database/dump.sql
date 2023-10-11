@@ -25,7 +25,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `checklist` (
   `checkListID` int(11) NOT NULL,
-  `topic` int(11) NOT NULL,
+  `topic` varchar(300 ) NOT NULL,
   `courseID` int(11) NOT NULL,
   `visibility` varchar(5) NOT NULL,
   `deadline` date DEFAULT NULL
@@ -75,7 +75,7 @@ CREATE TABLE `completedchecklist` (
 
 CREATE TABLE `course` (
   `courseID` int(11) NOT NULL,
-  `coursename` varchar(200) NOT NULL,
+  `courseName` varchar(200) NOT NULL,
   `schoolID` int(11) DEFAULT NULL,
   `numEnrolledStudents` int(11) NOT NULL,
   `lecturer` varchar(100) NOT NULL
@@ -353,13 +353,14 @@ INSERT INTO school(facultyID, schoolName) VALUES(1,"MATHEMATICS");
 
 -- Course 
 
-INSERT INTO course(schoolID, numEnrolledStudents,lecturer) VALUES(1,1,"Reala");
+INSERT INTO course(schoolID,courseName, numEnrolledStudents,lecturer) VALUES(1,"Calculus",1,"Reala");
 
 -- Enroll Student into course
 
 INSERT INTO enrollment(studentID, courseID) VALUES(1,1);
 
-SELECT * from students;
+INSERT INTO checklist(topic,courseID,visibility) VALUES("Integration",1,"yes");
 
-
+INSERT INTO checklistitems(checkListID,checkListItem) VALUES(1,"Hello");
+INSERT INTO checklistitems(checkListID,checkListItem) VALUES(1,"World");
 flush privileges;
