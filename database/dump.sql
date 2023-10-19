@@ -364,3 +364,5 @@ INSERT INTO checklist(topic,courseID,visibility) VALUES("Integration",1,"yes");
 INSERT INTO checklistitems(checkListID,checkListItem) VALUES(1,"Hello");
 INSERT INTO checklistitems(checkListID,checkListItem) VALUES(1,"World");
 flush privileges;
+
+-- mysql -uroot -p password student_survey_db
