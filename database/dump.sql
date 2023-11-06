@@ -64,7 +64,8 @@ CREATE TABLE `comment` (
 CREATE TABLE `completedchecklist` (
   `completionID` int(11) NOT NULL,
   `checkListID` int(11) NOT NULL,
-  `studentID` int(11) NOT NULL
+  `studentID` int(11) NOT NULL,
+  `courseID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -173,7 +174,8 @@ ALTER TABLE `comment`
 ALTER TABLE `completedchecklist`
   ADD PRIMARY KEY (`completionID`),
   ADD KEY `checkListID` (`checkListID`),
-  ADD KEY `studentID` (`studentID`);
+  ADD KEY `studentID` (`studentID`),
+  ADD KEY `courseID` (`courseID`);
 
 --
 -- Indexes for table `course`
@@ -308,7 +310,8 @@ ALTER TABLE `comment`
 --
 ALTER TABLE `completedchecklist`
   ADD CONSTRAINT `completedchecklist_ibfk_1` FOREIGN KEY (`checkListID`) REFERENCES `checklist` (`checkListID`),
-  ADD CONSTRAINT `completedchecklist_ibfk_2` FOREIGN KEY (`studentID`) REFERENCES `students` (`studentID`);
+  ADD CONSTRAINT `completedchecklist_ibfk_2` FOREIGN KEY (`studentID`) REFERENCES `students` (`studentID`),
+  ADD CONSTRAINT `completedchecklist_ibfk_3` FOREIGN KEY (`courseID`) REFERENCES `course` (`courseID`);
 
 --
 -- Constraints for table `course`
@@ -366,3 +369,40 @@ INSERT INTO checklistitems(checkListID,checkListItem) VALUES(1,"World");
 flush privileges;
 
 -- mysql -uroot -p password student_survey_db
+
+
+
+DELIMITER //
+CREATE PROCEDURE checkListCompleted(IN in_courseName VARCHAR(200),IN in_studentNumber VARCHAR(20), IN in_checkListTopic VARCHAR(300))
+BEGIN
+  -- Primary keys of the student and the course in the database
+  DECLARE v_courseID INT(11) ;DECLARE v_studentID INT(11);DECLARE v_checklistID INT(11);
+  SELECT courseID INTO v_courseID FROM course where courseName COLLATE utf8mb4_general_ci =in_courseName COLLATE utf8mb4_general_ci;
+  SELECT studentID INTO v_studentID FROM students where studentNumber COLLATE utf8mb4_general_ci =in_studentNumber COLLATE utf8mb4_general_ci;
+  SELECT checkListID INTO v_checklistID FROM checklist where topic COLLATE utf8mb4_general_ci =in_checkListTopic COLLATE utf8mb4_general_ci AND courseID COLLATE utf8mb4_general_ci=v_courseID COLLATE utf8mb4_general_ci;
+
+  INSERT INTO completedchecklist(checkListID,studentID,courseID) VALUES(v_checklistID,v_studentID,v_courseID);
+END//
+DELIMITER ;
+
+-- Procedure to delete a checklist
+DELIMITER //
+CREATE PROCEDURE deleteCheckList(IN in_courseName VARCHAR(200), IN in_topic VARCHAR(200))
+BEGIN
+  -- Checklist ID used to delete items corresponding to checklist in courseName with topic in_topic
+  DECLARE v_courseID INT(11);DECLARE v_checklistID INT(11);
+
+  SELECT courseID INTO v_courseID FROM course WHERE courseName COLLATE utf8mb4_general_ci=in_courseName COLLATE utf8mb4_general_ci;
+  SELECT checkListID INTO v_checklistID FROM checklist WHERE topic COLLATE utf8mb4_general_ci=in_topic COLLATE utf8mb4_general_ci AND courseID COLLATE utf8mb4_general_ci =v_courseID COLLATE utf8mb4_general_ci;
+  
+  --  Delete Completions for a checklist
+  DELETE FROM completedchecklist where courseID=v_courseID and checkListID COLLATE utf8mb4_general_ci=v_checklistID COLLATE utf8mb4_general_ci;
+
+  -- Delete all Items of a checklist
+  DELETE FROM checklistitems WHERE checkListID COLLATE utf8mb4_general_ci=v_checklistID COLLATE utf8mb4_general_ci;
+
+  -- Delete checklist
+  DELETE from checklist WHERE checkListID COLLATE utf8mb4_general_ci=v_checklistID COLLATE utf8mb4_general_ci AND courseID COLLATE utf8mb4_general_ci =v_courseID COLLATE utf8mb4_general_ci;
+
+END//
+DELIMITER ;

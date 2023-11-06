@@ -1,4 +1,4 @@
-const { json } = require('express');
+const { query } = require('express');
 let configuration = require('./config.js'); // Import Configs Class
 
 const checkListRouter = configuration.express.Router();
@@ -30,9 +30,31 @@ checkListRouter.get('/checklist/retrieve',(req,res)=>{
   if(studentNumber === undefined){
     res.send("No student Number provided");
   }else{
-    configuration.connection.query(query,[studentNumber],(err,row)=>{
+    configuration.connection.query(query,[studentNumber],(err,result)=>{
       if(err){res.json({success:false , err})}
-      res.json({success:true,row});});
+      else{
+        let last_topic ="";
+        let send_data = [];// Array of data objects
+        for(let row of result){
+          // Done to not go over a topic again
+          if(row.topic === last_topic ){
+            continue;
+          }else{
+            last_topic = row.topic;
+          }
+         
+          let items_array = []; // Array to hold items
+          for(let i =0; i < result.length ;i++){
+              if(result[i].topic == row.topic)
+                items_array.push(result[i].checkListItem);
+          }
+          let data = {topic:row.topic ,items : items_array,course_name:row.courseName,deadline :row.deadline ,visibility: row.visibility};
+          send_data.push(data);
+        }
+        res.json(JSON.parse(JSON.stringify(send_data)));
+
+      }
+    });
   }
 });
 
@@ -82,4 +104,53 @@ checkListRouter.post('/checklist/insert',(req,res)=>{
 
 });
 
+
+checkListRouter.get('/checklist/completed',(req, res)=>{
+    let studentNumber = req.query.studentNumber;
+    let courseName = req.query.courseName;
+    let checkListTopic = req.query.topic;
+
+    /**
+     * Update database using stored procedure
+     * NAME : checkListCompleted
+     * Argc : 3
+     * Arguments = courseName,studentNumber,checkListTopic
+     *  */ 
+    
+    let query = "CALL checklistcompleted(?,?,?)";
+    configuration.connection.query(query,[courseName,studentNumber,checkListTopic],(err,results)=>{
+        if(err){
+          res.json({
+            success:false,
+            message:err
+          });
+        }else{
+          res.json({
+            success:true,
+            message:"Succesfully updated",
+            results
+          }); 
+        }
+    });
+});
+
+checkListRouter.get('/checklist/delete',(req,res)=>{
+  let courseName = req.query.courseName;
+  let topic = req.query.topic;
+
+  let deleteQuery = "CALL deletechecklist(?,?)";
+  configuration.connection.query(deleteQuery,[courseName,topic],(err,row)=>{
+    if(err){
+      res.json({
+        success:false,
+        err
+      });
+    }else{
+      res.json({
+        success:true,
+        message: "Checklist deleted successfully."
+      });
+    }
+  });
+});
 module.exports = checkListRouter;
