@@ -1,5 +1,5 @@
 # Copy latest Mysql Base Image from DockerHub
-FROM mysql 
+FROM mysql
 
 # Default port for mysql
 EXPOSE 3306 
